@@ -1,0 +1,21 @@
+#nappi {
+  box-sizing: content-box;
+  width: 100vw;
+  height: 100vh;
+  background-color: red;
+  appearance: none;
+  outline: none;
+  border: none;
+  font-size: 100px;
+  color: white;
+}
+
+#roolivalinta {
+  position: fixed;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
+
+}
+
+#roolivalinta>h3 {}
