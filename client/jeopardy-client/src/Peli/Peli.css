@@ -1,0 +1,73 @@
+#pelialue {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+  grid-template-rows: 1.2fr 1fr 1fr 1fr 1fr 1fr;
+  gap: 8px;
+  padding: 20px;
+  padding-left: 50px;
+}
+
+.general {
+  appearance: none;
+  border: none;
+  outline: none;
+  font-weight: 800;
+  font-size: 18px;
+
+}
+
+.red {
+  background-color: var(--red);
+  border-radius: 4px;
+  width: 100%;
+  height: 100%;
+}
+
+.top {
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 400;
+}
+
+#pistelaskuri {
+  border-top: 2px solid var(--red);
+  border-bottom: 2px solid var(--red);
+  width: 80%;
+  height: 75%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: flex-end;
+}
+
+#abitopet {
+  margin-top: 5px;
+  width: 80%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
+
+#abitopet>div {
+  color: var(--red);
+}
+
+#raja {
+  color: var(--red);
+  font-size: 14px;
+  position: relative;
+  top: 8px;
+  right: 60%;
+}
+
+#pistelaskuri>div {
+  width: 35px;
+  background-color: var(--red);
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
