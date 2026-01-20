@@ -1,3 +1,4 @@
+import { Dialog } from "../Komponentit/Dialog";
 import Pelialue from "./Pelialue";
 import Pistelaskuri from "./Pistelaskuri";
 

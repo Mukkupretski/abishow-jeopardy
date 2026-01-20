@@ -12,7 +12,10 @@ const io = new Server(httpServer, {
   }
 });
 
-let canAnswer: boolean = true;
+type NappiData = { opet: boolean, abit: boolean, yleinen: boolean }
+
+
+let canAnswer: NappiData = { opet: false, abit: false, yleinen: false };
 
 io.on('connection', (socket) => {
   console.log(socket.id, "yhdisti");
@@ -20,16 +23,24 @@ io.on('connection', (socket) => {
   io.emit('asetanappi', canAnswer)
   socket.on('gitpush', (data: { opettaja: boolean }) => {
     console.log(data.opettaja ? "Opettaja" : "Opiskelija", "painoi nappia")
-    if (!canAnswer) {
+    if (!canAnswer.yleinen) {
       console.log("Nappi oli pois käytöstä")
       return;
     }
-    io.emit('gitpush', data);
+    const final: boolean = (!canAnswer.opet || !canAnswer.abit)
+    canAnswer = { opet: !data.opettaja, abit: data.opettaja, yleinen: false };
+    io.emit('gitpush', { ...data, final: final });
+    io.emit('asetanappi', canAnswer)
   });
-  socket.on('asetanappi', (data: { nappistatus: boolean }) => {
-    console.log("Nappi aktivoitu")
-    canAnswer = data.nappistatus;
-    io.emit('asetanappi', data.nappistatus)
+  socket.on('asetanappi', (data: NappiData) => {
+    console.log("Nappi toggled")
+    canAnswer = data
+    io.emit('asetanappi', canAnswer)
+  });
+  socket.on('asetanappiyleinen', (data: boolean) => {
+    console.log("Nappi toggled")
+    canAnswer = { ...canAnswer, yleinen: data }
+    io.emit('asetanappi', canAnswer)
   });
 
   socket.on('disconnect', () => {

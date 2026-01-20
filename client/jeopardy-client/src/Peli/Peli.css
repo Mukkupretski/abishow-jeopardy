@@ -33,6 +33,11 @@
   font-weight: 400;
 }
 
+.off {
+  background-color: black;
+  color: black;
+}
+
 #pistelaskuri {
   border-top: 2px solid var(--red);
   border-bottom: 2px solid var(--red);

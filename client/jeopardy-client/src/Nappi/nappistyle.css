@@ -10,12 +10,6 @@
   color: white;
 }
 
-#roolivalinta {
-  position: fixed;
-  top: 50vh;
-  left: 50vw;
-  transform: translate(-50%, -50%);
-
+#nappi:disabled {
+  background-color: darkgray;
 }
-
-#roolivalinta>h3 {}

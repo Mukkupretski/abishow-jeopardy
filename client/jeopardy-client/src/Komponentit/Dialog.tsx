@@ -1,9 +1,9 @@
-import { forwardRef, type ReactNode } from "react"
+import { forwardRef, type CSSProperties, type ReactNode } from "react"
 import "./Dialogstyle.css"
 
 
-export const Dialog = forwardRef<HTMLDialogElement, { children: ReactNode }>((props, ref) => {
-  return <dialog className="dialog" ref={ref}>
+export const Dialog = forwardRef<HTMLDialogElement, { children: ReactNode, style?: CSSProperties }>((props, ref) => {
+  return <dialog className="dialog" style={props.style} ref={ref}>
     {props.children}
   </dialog>
 })

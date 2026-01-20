@@ -4,6 +4,7 @@ import { Socket, io } from "socket.io-client"
 import { Dialog } from "../Komponentit/Dialog";
 
 const socket: Socket = io('http://localhost:3000'); // Replace with Tailscale IP when online
+export type NappiData = { opet: boolean, abit: boolean, yleinen: boolean }
 
 export default function Nappi() {
   const [opettaja, setOpettaja] = useState<boolean | null>(null);
@@ -13,22 +14,40 @@ export default function Nappi() {
       ref.current?.showModal()
     }, 0)
   }, [])
+  const [enabled, setEnabled] = useState<boolean>(true)
   useEffect(() => {
-    socket.emit("gitpush", { opettaja: true })
-  }, [])
+    socket.on("asetanappi", (nappistatus: NappiData) => {
+      setEnabled(nappistatus.yleinen && !((!nappistatus.abit && !opettaja) || (!nappistatus.opet && opettaja)))
+    })
+    return () => {
+      socket.off("asetanappi")
+    }
+  })
   useEffect(() => {
     if (opettaja !== null) ref.current?.close()
   }, [opettaja])
-  return <><button id="nappi">Vastaa
+  return <><button onClick={() => {
+    socket.emit("gitpush", { opettaja: opettaja })
+  }} disabled={!enabled || opettaja === null} id="nappi">Vastaa
   </button><Dialog ref={ref} >
-      <h3>Valitse roolisi</h3>
-      <div>
-        <button onClick={() => {
+      <h3 style={{
+        textAlign: "center",
+        marginBottom: "20px"
+      }}>Olen...</h3>
+      <div style={{
+        display: "flex",
+        flexDirection: "row",
+        gap: "80px",
+        justifyContent: "space-around",
+        boxSizing: "border-box",
+        paddingInline: "20px",
+      }}>
+        <button className="dialogbutton" onClick={() => {
           setOpettaja(true)
-        }}>Opettaja</button>
-        <button onClick={() => {
+        }}>Ope</button>
+        <button className="dialogbutton" onClick={() => {
           setOpettaja(false)
-        }}>Opiskelija</button>
+        }}>Abi</button>
       </div>
     </Dialog></>
 }

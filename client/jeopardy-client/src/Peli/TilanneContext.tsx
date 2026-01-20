@@ -14,7 +14,7 @@ type TilanneContextType = {
 const TilanneContext = createContext<TilanneContextType | undefined>(undefined);
 
 export const TilanneProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [value, setValue] = useState<Tilanne>({ opet: 100, abit: 10 });
+  const [value, setValue] = useState<Tilanne>({ opet: 0, abit: 0 });
 
   return (
     <TilanneContext.Provider value={{ value, setValue }}>

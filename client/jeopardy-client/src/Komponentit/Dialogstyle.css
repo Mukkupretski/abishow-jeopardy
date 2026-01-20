@@ -1,0 +1,30 @@
+.dialog {
+  box-sizing: border-box;
+  background-color: black;
+  color: var(--red);
+  border: none;
+  top: 50vh;
+  left: 50vw;
+  transform: translate(-50%, -50%);
+  position: fixed;
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.dialogbutton {
+  background-color: black;
+  border: none;
+  outline: none;
+  color: var(--red);
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.dialogbutton:hover {
+  background-color: hsl(0, 0%, 10%);
+}
+
+.vastausboxi img:hover {
+  background-color: hsl(0, 0%, 10%);
+  border-radius: 5px;
+}
