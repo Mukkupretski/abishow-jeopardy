@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState } from "react";
 export type Tilanne = {
   opet: number;
   abit: number;
+  kakkoset: number;
 }
 
 type TilanneContextType = {
@@ -14,7 +15,7 @@ type TilanneContextType = {
 const TilanneContext = createContext<TilanneContextType | undefined>(undefined);
 
 export const TilanneProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [value, setValue] = useState<Tilanne>({ opet: 0, abit: 0 });
+  const [value, setValue] = useState<Tilanne>({ opet: 0, abit: 0, kakkoset: 0 });
 
   return (
     <TilanneContext.Provider value={{ value, setValue }}>

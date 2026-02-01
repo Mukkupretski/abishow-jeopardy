@@ -10,5 +10,8 @@ export default function Pistelaskuri() {
       <div style={{
         height: `${tilanne.opet / 1.5}%`
       }}>{tilanne.opet}</div>
+      <div style={{
+        height: `${tilanne.kakkoset / 1.5}%`
+      }}>{tilanne.kakkoset}</div>
     </div> </>
 }

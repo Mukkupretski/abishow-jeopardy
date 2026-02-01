@@ -4,10 +4,10 @@ import { Socket, io } from "socket.io-client"
 import { Dialog } from "../Komponentit/Dialog";
 
 const socket: Socket = io('http://localhost:3000'); // Replace with Tailscale IP when online
-export type NappiData = { opet: boolean, abit: boolean, yleinen: boolean }
+export type NappiData = { vastanneet: string[], yleinen: boolean }
 
 export default function Nappi() {
-  const [opettaja, setOpettaja] = useState<boolean | null>(null);
+  const [rooli, setRooli] = useState<string | null>(null);
   const ref = useRef<HTMLDialogElement | null>(null)
   useEffect(() => {
     setTimeout(() => {
@@ -16,19 +16,21 @@ export default function Nappi() {
   }, [])
   const [enabled, setEnabled] = useState<boolean>(true)
   useEffect(() => {
-    socket.on("asetanappi", (nappistatus: NappiData) => {
-      setEnabled(nappistatus.yleinen && !((!nappistatus.abit && !opettaja) || (!nappistatus.opet && opettaja)))
+    socket.on("asetanappi2", (nappistatus: NappiData) => {
+      console.log(nappistatus)
+      setEnabled(nappistatus.yleinen && (nappistatus.vastanneet.find(v => v == rooli) == null))
+      console.log(nappistatus.vastanneet.find(v => v == rooli) == null)
     })
     return () => {
-      socket.off("asetanappi")
+      socket.off("asetanappi2")
     }
-  })
+  }, [rooli])
   useEffect(() => {
-    if (opettaja !== null) ref.current?.close()
-  }, [opettaja])
+    if (rooli !== null) ref.current?.close()
+  }, [rooli])
   return <><button onClick={() => {
-    socket.emit("gitpush", { opettaja: opettaja })
-  }} disabled={!enabled || opettaja === null} id="nappi">Vastaa
+    socket.emit("gitpush", { rooli: rooli })
+  }} disabled={!enabled || rooli === null} id="nappi">Vastaa
   </button><Dialog ref={ref} >
       <h3 style={{
         textAlign: "center",
@@ -43,11 +45,14 @@ export default function Nappi() {
         paddingInline: "20px",
       }}>
         <button className="dialogbutton" onClick={() => {
-          setOpettaja(true)
+          setRooli("Ope")
         }}>Ope</button>
         <button className="dialogbutton" onClick={() => {
-          setOpettaja(false)
+          setRooli("Abi")
         }}>Abi</button>
+        <button className="dialogbutton" onClick={() => {
+          setRooli("Kakkonen")
+        }}>Kakkonen</button>
       </div>
     </Dialog></>
 }

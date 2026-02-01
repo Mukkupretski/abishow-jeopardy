@@ -12,35 +12,44 @@ const io = new Server(httpServer, {
   }
 });
 
-type NappiData = { opet: boolean, abit: boolean, yleinen: boolean }
+type NappiData = { vastanneet: string[], yleinen: boolean }
+const OSALLISTUJAT = 3
 
 
-let canAnswer: NappiData = { opet: false, abit: false, yleinen: false };
+let canAnswer: NappiData = { vastanneet: [], yleinen: false };
 
 io.on('connection', (socket) => {
   console.log(socket.id, "yhdisti");
-
   io.emit('asetanappi', canAnswer)
-  socket.on('gitpush', (data: { opettaja: boolean }) => {
-    console.log(data.opettaja ? "Opettaja" : "Opiskelija", "painoi nappia")
+  socket.on('gitpush', (data: { rooli: string }) => {
+    console.log(data.rooli, "painoi nappia")
     if (!canAnswer.yleinen) {
       console.log("Nappi oli pois käytöstä")
       return;
     }
-    const final: boolean = (!canAnswer.opet || !canAnswer.abit)
-    canAnswer = { opet: !data.opettaja, abit: data.opettaja, yleinen: false };
-    io.emit('gitpush', { ...data, final: final });
-    io.emit('asetanappi', canAnswer)
+    if (canAnswer.vastanneet.find(v => v == data.rooli)) {
+      console.log(data.rooli + " on jo pinanut nappia")
+      return;
+    }
+    canAnswer = { vastanneet: [...canAnswer.vastanneet, data.rooli], yleinen: false };
+    io.emit('gitpush', { ...data, final: canAnswer.vastanneet.length == OSALLISTUJAT });
+    if (canAnswer.vastanneet.length == OSALLISTUJAT) {
+      canAnswer = { vastanneet: [], yleinen: false }
+    }
+    io.emit('asetanappi2', canAnswer)
   });
-  socket.on('asetanappi', (data: NappiData) => {
-    console.log("Nappi toggled")
-    canAnswer = data
-    io.emit('asetanappi', canAnswer)
-  });
-  socket.on('asetanappiyleinen', (data: boolean) => {
-    console.log("Nappi toggled")
-    canAnswer = { ...canAnswer, yleinen: data }
-    io.emit('asetanappi', canAnswer)
+  socket.on("vapautakaikki", () => {
+    canAnswer = { vastanneet: [], yleinen: true }
+    console.log(canAnswer)
+    io.emit('asetanappi2', canAnswer)
+
+  })
+  // FIXME: HUOM. poistettiin asetanappiyleinen
+  socket.on('asetanappi', (data: { on: boolean }) => {
+    console.log(canAnswer)
+    console.log("here")
+    canAnswer = { ...canAnswer, yleinen: data.on }
+    io.emit('asetanappi2', canAnswer)
   });
 
   socket.on('disconnect', () => {

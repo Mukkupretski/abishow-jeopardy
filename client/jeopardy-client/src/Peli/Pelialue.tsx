@@ -3,6 +3,7 @@ import { Dialog } from "../Komponentit/Dialog";
 import "./Peli.css"
 import { io, type Socket } from "socket.io-client";
 import { useTilanne } from "./TilanneContext";
+import Win from "./Voitto";
 
 
 const kysymykset: { [key: string]: string[] } = {
@@ -50,21 +51,66 @@ type Question = {
 
 const socket: Socket = io('http://localhost:3000'); // Replace with Tailscale IP when online
 
+const taivutusmuodot = {
+  "Ope": "Opejen",
+  "Abi": "Abien",
+  "Kakkonen": "Kakkosten",
+}
+
 export default function Pelialue() {
-  const { setValue: setTilanne } = useTilanne()
-  const [opettajat, setOpettajat] = useState<boolean | null>(null)
+  const airhorn = useRef<HTMLAudioElement | null>(null)
+  const music = useRef<HTMLAudioElement | null>(null)
+  const win = useRef<HTMLAudioElement | null>(null)
+  const buzzer = useRef<HTMLAudioElement | null>(null)
+  const { value: tilanne, setValue: setTilanne } = useTilanne()
+  const [rooli, setRooli] = useState<"Ope" | "Abi" | "Kakkonen" | null>(null)
   const [gameStatus, setGameStatus] = useState("")
   const categories = Object.keys(kysymykset);
   const values = Object.values(kysymykset);
   const [final, setFinal] = useState(false)
   const [disabled, setDisabled] = useState<number[][]>([])
+  const [voittaja, setVoittaja] = useState<string | null>(null)
   const [question, setQuestion] = useState<Question | null>(null)
+  const [vastausTimeout, setVastausTimeout] = useState<number | null>(null)
+  const [timeleft, setTimeleft] = useState<number>(0)
   const ref = useRef<HTMLDialogElement | null>(null);
+  const UusiVuoro = () => {
+    setTimeleft(10)
+    setVastausTimeout(setInterval(() => {
+      setTimeleft(tl => {
+        if (tl == 0) {
+          PäätäVuoro()
+          setGameStatus("")
+          clearInterval(vastausTimeout!)
+          return 0;
+        }
+        return tl - 1;
+      }
+      )
+    }, 1000))
+    setGameStatus("Odotetaan vastausta...")
+  }
+  const PäätäVuoro = () => {
+    socket.emit("asetanappi", { on: false })
+    setRooli(null)
+    setQuestion(null)
+    setFinal(false)
+  }
   useEffect(() => {
-    socket.on("gitpush", (data: { opettaja: boolean, final: boolean }) => {
+    if (gameStatus == "Odotetaan vastausta...") {
+      music.current!.loop = true
+      music.current?.play()
+    } else {
+      music.current?.pause()
+    }
+  }, [gameStatus])
+  useEffect(() => {
+    socket.on("gitpush", (data: { rooli: ("Ope" | "Abi" | "Kakkonen"), final: boolean }) => {
       if (gameStatus == "Odotetaan vastausta...") {
-        setGameStatus(`${data.opettaja ? "Opejen" : "Abien"} vastausvuoro`)
-        setOpettajat(data.opettaja)
+        buzzer.current?.play()
+        if (vastausTimeout) clearInterval(vastausTimeout)
+        setGameStatus(`${taivutusmuodot[data.rooli]} vastausvuoro`)
+        setRooli(data.rooli)
         setFinal(data.final)
       }
     })
@@ -79,14 +125,29 @@ export default function Pelialue() {
     }
     else {
       ref.current?.showModal()
-      setGameStatus("Odotetaan vastausta...")
-      socket.emit("asetanappi", { opet: true, abit: true, yleinen: true })
+      socket.emit("vapautakaikki")
+      UusiVuoro()
     }
   }, [question])
+  useEffect(() => {
+    if (tilanne.abit >= 150) setVoittaja("Abit")
+    if (tilanne.opet >= 150) setVoittaja("Opet")
+    if (tilanne.kakkoset >= 150) setVoittaja("Kakkoset")
+  }, [tilanne])
+  useEffect(() => {
+    airhorn.current?.play()
+  }, [voittaja])
   return <div id="pelialue">
+    <>
+      <audio ref={airhorn} src="/sounds/airhorn.mp3"></audio>
+      <audio ref={music} src="/sounds/music.mp3"></audio>
+      <audio ref={buzzer} src="/sounds/buzzer.mp3"></audio>
+      <audio ref={win} src="/sounds/win.mp3"></audio>
+    </>
     {categories.map((key) => (
       <div key={key} className="red top">{key}</div>
     ))}
+    {voittaja === null ? <></> : <Win winner={voittaja}></Win>}
     {values.map((arr, colIndex) =>
       arr.map((item, rowIndex) => {
         let currentOff: boolean = false;
@@ -122,37 +183,36 @@ export default function Pelialue() {
           marginTop: "20px",
           marginBottom: "40px",
         }}>{question?.question}</h3>
-        {opettajat != null ?
+        {rooli != null ?
           <div style={{
             display: "flex",
             flexDirection: "row",
             gap: "50px"
           }}><img onClick={() => {
+            win.current?.play()
             setTilanne(t => {
               return {
-                abit: t.abit + (opettajat ? 0 : question!.op),
-                opet: t.opet + (opettajat ? question!.op : 0)
+                abit: t.abit + (rooli == "Abi" ? question!.op : 0),
+                opet: t.opet + (rooli == "Ope" ? question!.op : 0),
+                kakkoset: t.kakkoset + (rooli == "Kakkonen" ? question!.op : 0),
               }
             })
-            socket.emit("asetanappiyleinen", false)
-            setQuestion(null)
-            setOpettajat(null)
-            setFinal(false)
+            PäätäVuoro()
           }} src="/Check.png"></img><img onClick={() => {
-            setGameStatus("Odotetaan vastausta...")
-            setOpettajat(null)
+            setRooli(null)
+            buzzer.current?.play()
             if (final) {
-              setQuestion(null)
-              setFinal(false)
+              PäätäVuoro()
             } else {
-              socket.emit("asetanappiyleinen", true)
+              UusiVuoro()
+              socket.emit("asetanappi", { on: true })
             }
           }} src="/X.png"></img></div> : <></>
         }
         <h4 style={{
           marginTop: "20px",
           alignSelf: "flex-start"
-        }}>Tila: {gameStatus}</h4>
+        }}>Tila: {gameStatus} {gameStatus == "Odotetaan vastausta..." ? `(${timeleft} s)` : ""}</h4>
       </div>
     </Dialog>
   </div>

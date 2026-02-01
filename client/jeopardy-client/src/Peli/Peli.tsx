@@ -1,6 +1,7 @@
 import { Dialog } from "../Komponentit/Dialog";
 import Pelialue from "./Pelialue";
 import Pistelaskuri from "./Pistelaskuri";
+import Win from "./Voitto";
 
 export default function Peli() {
   return <div style={{
@@ -43,6 +44,7 @@ export default function Peli() {
       <div id="abitopet">
         <div>Abit</div>
         <div>Opet</div>
+        <div>Kakkoset</div>
       </div>
       <img src="/pii.png" style={{
         width: "40%",
