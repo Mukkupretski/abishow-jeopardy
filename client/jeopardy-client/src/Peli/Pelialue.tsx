@@ -150,6 +150,7 @@ export default function Pelialue() {
     {voittaja === null ? <></> : <Win winner={voittaja}></Win>}
     {values.map((arr, colIndex) =>
       arr.map((item, rowIndex) => {
+        console.log(item)
         let currentOff: boolean = false;
         if (disabled.find(val => val[0] == colIndex && val[1] == rowIndex)) currentOff = true;
         return <button onClick={() => {

@@ -1,7 +1,5 @@
-import { Dialog } from "../Komponentit/Dialog";
 import Pelialue from "./Pelialue";
 import Pistelaskuri from "./Pistelaskuri";
-import Win from "./Voitto";
 
 export default function Peli() {
   return <div style={{
