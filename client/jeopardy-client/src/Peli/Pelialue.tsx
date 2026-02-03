@@ -5,6 +5,8 @@ import { io, type Socket } from "socket.io-client";
 import { useTilanne } from "./TilanneContext";
 import Win from "./Voitto";
 
+// const SOCKET_ADDR = "http://localhost:3000"
+const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
 
 const kysymykset: { [key: string]: string[] } = {
   "Matematiikka": [
@@ -49,7 +51,7 @@ type Question = {
   question: string;
 }
 
-const socket: Socket = io('http://localhost:3000'); // Replace with Tailscale IP when online
+const socket: Socket = io(SOCKET_ADDR);
 
 const taivutusmuodot = {
   "Ope": "Opejen",
@@ -69,13 +71,16 @@ export default function Pelialue() {
   const values = Object.values(kysymykset);
   const [final, setFinal] = useState(false)
   const [disabled, setDisabled] = useState<number[][]>([])
+  // useEffect(() => {
+  //   window.location.replace(" https://www.youtube.com/watch?v=dQw4w9WgXcQ")
+  // }, [])
   const [voittaja, setVoittaja] = useState<string | null>(null)
   const [question, setQuestion] = useState<Question | null>(null)
   const [vastausTimeout, setVastausTimeout] = useState<number | null>(null)
   const [timeleft, setTimeleft] = useState<number>(0)
   const ref = useRef<HTMLDialogElement | null>(null);
   const UusiVuoro = () => {
-    setTimeleft(10)
+    setTimeleft(10000)
     setVastausTimeout(setInterval(() => {
       setTimeleft(tl => {
         if (tl == 0) {

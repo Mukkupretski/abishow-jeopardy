@@ -3,7 +3,10 @@ import "./nappistyle.css"
 import { Socket, io } from "socket.io-client"
 import { Dialog } from "../Komponentit/Dialog";
 
-const socket: Socket = io('http://localhost:3000'); // Replace with Tailscale IP when online
+// const SOCKET_ADDR = "http://localhost:3000"
+const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
+
+const socket: Socket = io(SOCKET_ADDR); // Replace with Tailscale IP when online
 export type NappiData = { vastanneet: string[], yleinen: boolean }
 
 export default function Nappi() {
@@ -14,7 +17,7 @@ export default function Nappi() {
       ref.current?.showModal()
     }, 0)
   }, [])
-  const [enabled, setEnabled] = useState<boolean>(true)
+  const [enabled, setEnabled] = useState<boolean>(false)
   useEffect(() => {
     socket.on("asetanappi2", (nappistatus: NappiData) => {
       console.log(nappistatus)

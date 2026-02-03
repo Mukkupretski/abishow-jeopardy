@@ -10,4 +10,16 @@ export default defineConfig({
       },
     }),
   ],
+  server: {
+
+    allowedHosts: ["subpalmated-lucilla-nontenably.ngrok-free.dev"],
+    // ChatGPT
+    host: true,
+    port: 5173,
+    hmr: {
+      protocol: "wss",
+      host: "subpalmated-lucilla-nontenably.ngrok-free.dev",
+      clientPort: 443
+    }
+  }
 })
