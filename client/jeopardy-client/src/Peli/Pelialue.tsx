@@ -78,28 +78,10 @@ export default function Pelialue() {
   // }, [])
   const [voittaja, setVoittaja] = useState<string | null>(null)
   const [question, setQuestion] = useState<Question | null>(null)
-  const [vastausTimeout, setVastausTimeout] = useState<number | null>(null)
-  const [timeleft, setTimeleft] = useState<number>(0)
-  const painamisAika = useRef<Date>(new Date())
 
   const ref = useRef<HTMLDialogElement | null>(null);
   const UusiVuoro = () => {
-    painamisAika.current = (new Date())
     socket.emit("nytvuorossa", { tiimi: null })
-    setVastausTimeout(setInterval(() => {
-      setTimeleft(() => {
-        const timeGone = Math.floor((Date.now() - painamisAika.current.getTime()) / 1000)
-        const tl = Math.max(0, VASTAUSAIKA - timeGone)
-        if (tl == 0) {
-          PäätäVuoro()
-          setGameStatus("")
-          clearInterval(vastausTimeout!)
-          return 0;
-        }
-        return tl;
-      }
-      )
-    }, 200))
     setGameStatus("Odotetaan vastausta...")
   }
   const PäätäVuoro = () => {
@@ -108,6 +90,7 @@ export default function Pelialue() {
     setRooli(null)
     setQuestion(null)
     setFinal(false)
+    setGameStatus("")
   }
   useEffect(() => {
     if (gameStatus == "Odotetaan vastausta...") {
@@ -122,7 +105,6 @@ export default function Pelialue() {
       if (gameStatus == "Odotetaan vastausta...") {
         buzzer.current?.play()
         socket.emit("nytvuorossa", { tiimi: data.rooli })
-        if (vastausTimeout) clearInterval(vastausTimeout)
         setGameStatus(`${taivutusmuodot[data.rooli]} vastausvuoro`)
         setRooli(data.rooli)
         setFinal(data.final)
@@ -224,10 +206,24 @@ export default function Pelialue() {
             }
           }} src="/X.png"></img></div> : <></>
         }
-        <h4 style={{
+        <div style={{
           marginTop: "20px",
-          alignSelf: "flex-start"
-        }}>Tila: {gameStatus} {gameStatus == "Odotetaan vastausta..." ? `(${timeleft} s)` : ""}</h4>
+          alignSelf: "flex-start",
+          alignItems: "center",
+          display: "flex",
+          flexDirection: "row",
+          width: "100%",
+          gap: "30px"
+        }}>
+          <h4>Tila: {gameStatus} </h4>
+          <h4 id="skip" style={{
+            padding: "5px",
+            marginLeft: "auto",
+            borderRadius: "5px"
+          }} onClick={() => {
+            PäätäVuoro()
+          }} >Ohita kysymys</h4>
+        </div>
       </div>
     </Dialog>
   </div>
