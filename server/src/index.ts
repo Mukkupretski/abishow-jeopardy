@@ -44,6 +44,9 @@ io.on('connection', (socket) => {
     io.emit('asetanappi2', canAnswer)
 
   })
+  socket.on('nytvuorossa', data => {
+    io.emit("nytvuorossa", data)
+  })
   // FIXME: HUOM. poistettiin asetanappiyleinen
   socket.on('asetanappi', (data: { on: boolean }) => {
     console.log(canAnswer)

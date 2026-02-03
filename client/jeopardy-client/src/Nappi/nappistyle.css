@@ -13,3 +13,7 @@
 #nappi:disabled {
   background-color: darkgray;
 }
+
+#nappi.vuorossa {
+  background-color: green !important;
+}

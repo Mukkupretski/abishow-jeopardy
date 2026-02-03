@@ -5,8 +5,8 @@ import { io, type Socket } from "socket.io-client";
 import { useTilanne } from "./TilanneContext";
 import Win from "./Voitto";
 
-// const SOCKET_ADDR = "http://localhost:3000"
-const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
+const SOCKET_ADDR = "http://localhost:3000"
+// const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
 // seconds
 const VASTAUSAIKA = 20
 
@@ -85,6 +85,7 @@ export default function Pelialue() {
   const ref = useRef<HTMLDialogElement | null>(null);
   const UusiVuoro = () => {
     painamisAika.current = (new Date())
+    socket.emit("nytvuorossa", { tiimi: null })
     setVastausTimeout(setInterval(() => {
       setTimeleft(() => {
         const timeGone = Math.floor((Date.now() - painamisAika.current.getTime()) / 1000)
@@ -103,6 +104,7 @@ export default function Pelialue() {
   }
   const PäätäVuoro = () => {
     socket.emit("asetanappi", { on: false })
+    socket.emit("nytvuorossa", { tiimi: null })
     setRooli(null)
     setQuestion(null)
     setFinal(false)
@@ -119,6 +121,7 @@ export default function Pelialue() {
     socket.on("gitpush", (data: { rooli: ("Ope" | "Abi" | "Kakkonen"), final: boolean }) => {
       if (gameStatus == "Odotetaan vastausta...") {
         buzzer.current?.play()
+        socket.emit("nytvuorossa", { tiimi: data.rooli })
         if (vastausTimeout) clearInterval(vastausTimeout)
         setGameStatus(`${taivutusmuodot[data.rooli]} vastausvuoro`)
         setRooli(data.rooli)

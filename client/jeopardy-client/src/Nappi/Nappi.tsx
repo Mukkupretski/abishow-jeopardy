@@ -3,13 +3,14 @@ import "./nappistyle.css"
 import { Socket, io } from "socket.io-client"
 import { Dialog } from "../Komponentit/Dialog";
 
-// const SOCKET_ADDR = "http://localhost:3000"
-const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
+const SOCKET_ADDR = "http://localhost:3000"
+// const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
 
-const socket: Socket = io(SOCKET_ADDR); // Replace with Tailscale IP when online
+const socket: Socket = io(SOCKET_ADDR);
 export type NappiData = { vastanneet: string[], yleinen: boolean }
 
 export default function Nappi() {
+  const [nytvuorossa, setNytVuorossa] = useState(false)
   const [rooli, setRooli] = useState<string | null>(null);
   const ref = useRef<HTMLDialogElement | null>(null)
   useEffect(() => {
@@ -24,8 +25,13 @@ export default function Nappi() {
       setEnabled(nappistatus.yleinen && (nappistatus.vastanneet.find(v => v == rooli) == null))
       console.log(nappistatus.vastanneet.find(v => v == rooli) == null)
     })
+    socket.on("nytvuorossa", (data: { tiimi: string | null }) => {
+      if (data.tiimi != null && data.tiimi == rooli) setNytVuorossa(true)
+      else setNytVuorossa(false)
+    })
     return () => {
       socket.off("asetanappi2")
+      socket.off("nytvuorossa")
     }
   }, [rooli])
   useEffect(() => {
@@ -33,7 +39,9 @@ export default function Nappi() {
   }, [rooli])
   return <><button onClick={() => {
     socket.emit("gitpush", { rooli: rooli })
-  }} disabled={!enabled || rooli === null} id="nappi">Vastaa
+  }} className={
+    nytvuorossa ? "vuorossa" : ""
+  } disabled={!enabled || rooli === null} id="nappi">Vastaa
   </button><Dialog ref={ref} >
       <h3 style={{
         textAlign: "center",
