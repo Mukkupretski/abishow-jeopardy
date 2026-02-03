@@ -7,6 +7,8 @@ import Win from "./Voitto";
 
 // const SOCKET_ADDR = "http://localhost:3000"
 const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
+// seconds
+const VASTAUSAIKA = 20
 
 const kysymykset: { [key: string]: string[] } = {
   "Matematiikka": [
@@ -78,21 +80,25 @@ export default function Pelialue() {
   const [question, setQuestion] = useState<Question | null>(null)
   const [vastausTimeout, setVastausTimeout] = useState<number | null>(null)
   const [timeleft, setTimeleft] = useState<number>(0)
+  const painamisAika = useRef<Date>(new Date())
+
   const ref = useRef<HTMLDialogElement | null>(null);
   const UusiVuoro = () => {
-    setTimeleft(10000)
+    painamisAika.current = (new Date())
     setVastausTimeout(setInterval(() => {
-      setTimeleft(tl => {
+      setTimeleft(() => {
+        const timeGone = Math.floor((Date.now() - painamisAika.current.getTime()) / 1000)
+        const tl = Math.max(0, VASTAUSAIKA - timeGone)
         if (tl == 0) {
           PäätäVuoro()
           setGameStatus("")
           clearInterval(vastausTimeout!)
           return 0;
         }
-        return tl - 1;
+        return tl;
       }
       )
-    }, 1000))
+    }, 200))
     setGameStatus("Odotetaan vastausta...")
   }
   const PäätäVuoro = () => {
