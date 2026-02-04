@@ -5,6 +5,7 @@ import { io, type Socket } from "socket.io-client";
 import { useTilanne } from "./TilanneContext";
 import Win from "./Voitto";
 
+const OP_MULTIPLIER = 10
 // const SOCKET_ADDR = "http://localhost:3000"
 const REDIRECT: boolean = false
 const REDIRECT_LINK: string = "https://obby.lol"
@@ -156,7 +157,7 @@ export default function Pelialue() {
           setDisabled((dis) => [...dis, [colIndex, rowIndex]])
           setQuestion(() => {
             return {
-              op: (colIndex + 1) * 10,
+              op: (colIndex + 1) * OP_MULTIPLIER,
               category: categories[rowIndex],
               question: values[rowIndex][colIndex]
             }
