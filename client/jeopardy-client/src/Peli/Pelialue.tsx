@@ -6,10 +6,10 @@ import { useTilanne } from "./TilanneContext";
 import Win from "./Voitto";
 
 const OP_MULTIPLIER = 10
-// const SOCKET_ADDR = "http://localhost:3000"
 const REDIRECT: boolean = false
 const REDIRECT_LINK: string = "https://obby.lol"
 //  https://www.youtube.com/watch?v=dQw4w9WgXcQ
+// const SOCKET_ADDR = "http://localhost:3000"
 const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
 
 const kysymykset: { [key: string]: string[] } = {
@@ -68,6 +68,7 @@ export default function Pelialue() {
   const music = useRef<HTMLAudioElement | null>(null)
   const win = useRef<HTMLAudioElement | null>(null)
   const buzzer = useRef<HTMLAudioElement | null>(null)
+  const bell = useRef<HTMLAudioElement | null>(null)
   const { value: tilanne, setValue: setTilanne } = useTilanne()
   const [rooli, setRooli] = useState<"Ope" | "Abi" | "Kakkonen" | null>(null)
   const [gameStatus, setGameStatus] = useState("")
@@ -97,17 +98,17 @@ export default function Pelialue() {
     setGameStatus("")
   }
   useEffect(() => {
-    if (gameStatus == "Odotetaan vastausta...") {
-      music.current!.loop = true
-      music.current?.play()
-    } else {
-      music.current?.pause()
-    }
+    // if (gameStatus == "Odotetaan vastausta...") {
+    //   music.current!.loop = true
+    //   music.current?.play()
+    // } else {
+    //   music.current?.pause()
+    // }
   }, [gameStatus])
   useEffect(() => {
     socket.on("gitpush", (data: { rooli: ("Ope" | "Abi" | "Kakkonen"), final: boolean }) => {
       if (gameStatus == "Odotetaan vastausta...") {
-        buzzer.current?.play()
+        bell.current?.play()
         socket.emit("nytvuorossa", { tiimi: data.rooli })
         setGameStatus(`${taivutusmuodot[data.rooli]} vastausvuoro`)
         setRooli(data.rooli)
@@ -141,6 +142,7 @@ export default function Pelialue() {
     <>
       <audio ref={airhorn} src="/sounds/airhorn.mp3"></audio>
       <audio ref={music} src="/sounds/music.mp3"></audio>
+      <audio ref={bell} src="/sounds/bell.mp3"></audio>
       <audio ref={buzzer} src="/sounds/buzzer.mp3"></audio>
       <audio ref={win} src="/sounds/win.mp3"></audio>
     </>
@@ -165,7 +167,7 @@ export default function Pelialue() {
 
         }} disabled={currentOff} className={`red general${currentOff ? " off" : ""}`}
           key={`${colIndex}-${rowIndex}`}
-        >{colIndex + 1}0 op</button>
+        >{(colIndex + 1) * OP_MULTIPLIER} op</button>
       }
       )
     )}
