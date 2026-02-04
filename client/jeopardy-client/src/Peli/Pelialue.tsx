@@ -5,10 +5,11 @@ import { io, type Socket } from "socket.io-client";
 import { useTilanne } from "./TilanneContext";
 import Win from "./Voitto";
 
-const SOCKET_ADDR = "http://localhost:3000"
-// const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
-// seconds
-const VASTAUSAIKA = 20
+// const SOCKET_ADDR = "http://localhost:3000"
+const REDIRECT: boolean = false
+const REDIRECT_LINK: string = "https://obby.lol"
+//  https://www.youtube.com/watch?v=dQw4w9WgXcQ
+const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
 
 const kysymykset: { [key: string]: string[] } = {
   "Matematiikka": [
@@ -73,9 +74,11 @@ export default function Pelialue() {
   const values = Object.values(kysymykset);
   const [final, setFinal] = useState(false)
   const [disabled, setDisabled] = useState<number[][]>([])
-  // useEffect(() => {
-  //   window.location.replace(" https://www.youtube.com/watch?v=dQw4w9WgXcQ")
-  // }, [])
+  useEffect(() => {
+    if (REDIRECT) {
+      window.location.replace(REDIRECT_LINK)
+    }
+  }, [])
   const [voittaja, setVoittaja] = useState<string | null>(null)
   const [question, setQuestion] = useState<Question | null>(null)
 

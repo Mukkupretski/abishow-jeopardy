@@ -3,8 +3,8 @@ import "./nappistyle.css"
 import { Socket, io } from "socket.io-client"
 import { Dialog } from "../Komponentit/Dialog";
 
-const SOCKET_ADDR = "http://localhost:3000"
-// const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
+// const SOCKET_ADDR = "http://localhost:3000"
+const SOCKET_ADDR = "https://subpalmated-lucilla-nontenably.ngrok-free.dev/"
 
 const socket: Socket = io(SOCKET_ADDR);
 export type NappiData = { vastanneet: string[], yleinen: boolean }
