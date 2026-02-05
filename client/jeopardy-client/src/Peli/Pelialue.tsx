@@ -136,7 +136,7 @@ export default function Pelialue() {
     if (tilanne.kakkoset >= 150) setVoittaja("Kakkoset")
   }, [tilanne])
   useEffect(() => {
-    airhorn.current?.play()
+    if (voittaja) airhorn.current?.play()
   }, [voittaja])
   return <div id="pelialue">
     <>

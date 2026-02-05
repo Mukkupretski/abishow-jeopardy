@@ -37,12 +37,21 @@ export default function Nappi() {
   useEffect(() => {
     if (rooli !== null) ref.current?.close()
   }, [rooli])
-  return <><button onClick={() => {
-    socket.emit("gitpush", { rooli: rooli })
-  }} className={
-    nytvuorossa ? "vuorossa" : ""
-  } disabled={!enabled || rooli === null} id="nappi">Vastaa
-  </button><Dialog ref={ref} >
+  return <>
+    <p style={{
+      position: "absolute",
+      pointerEvents: "none",
+      textAlign: "center",
+      fontSize: "32px",
+      top: "50px",
+      width: "100%",
+    }}>{rooli}</p>
+    <button onClick={() => {
+      socket.emit("gitpush", { rooli: rooli })
+    }} className={
+      nytvuorossa ? "vuorossa" : ""
+    } disabled={!enabled || rooli === null} id="nappi">Vastaa
+    </button><Dialog ref={ref} >
       <h3 style={{
         textAlign: "center",
         marginBottom: "20px"
